@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { getAuthUser } from '@/lib/helpers/auth';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
 import { success, unauthorized, serverError } from '@/lib/helpers/errors';
 
 /**
@@ -75,7 +76,9 @@ export async function POST(request: NextRequest) {
     // Generate a simple slug/key from the name
     const key = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
 
-    const { data, error } = await supabase
+    // Use Admin client to bypass RLS for global league creation
+    const supabaseAdmin = getSupabaseAdmin();
+    const { data, error } = await supabaseAdmin
       .from('leagues')
       .insert({
         name,

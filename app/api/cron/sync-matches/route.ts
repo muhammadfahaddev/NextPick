@@ -61,8 +61,15 @@ export async function POST(request: NextRequest) {
       for (const league of leagues) {
         const apiResponse = await cricApi.getSeriesInfo(league.series_id);
         if (apiResponse.status === 'success' && apiResponse.data) {
-          const synced = await processMatches(apiResponse.data, league.id, league.name);
-          results.push(synced);
+          // Matches can be directly in data (for search) or in data.matchList (for series_info)
+          const matches = Array.isArray(apiResponse.data) 
+            ? apiResponse.data 
+            : apiResponse.data.matchList;
+
+          if (matches && Array.isArray(matches)) {
+            const synced = await processMatches(matches, league.id, league.name);
+            results.push(synced);
+          }
         }
       }
     } else {

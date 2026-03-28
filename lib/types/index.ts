@@ -203,7 +203,7 @@ export interface CricApiScore {
 
 export interface CricApiSeriesResponse {
   apikey: string;
-  data: CricApiMatch[];
+  data: any;
   status: string;
   info: {
     hitsToday: number;
