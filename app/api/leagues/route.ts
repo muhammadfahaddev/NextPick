@@ -19,10 +19,30 @@ import { success, unauthorized, serverError } from '@/lib/helpers/errors';
  *     responses:
  *       200:
  *         description: List of leagues
+ *   post:
+ *     summary: Add a new league to the database
+ *     tags: [Leagues]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [name, series_id]
+ *             properties:
+ *               name: { type: string }
+ *               series_id: { type: string }
+ *               league_type: { type: string }
+ *     responses:
+ *       201:
+ *         description: League added
  */
 export async function GET(request: NextRequest) {
   try {
-    const { supabase } = await getAuthUser(request);
+    const { supabase, error: authError } = await getAuthUser(request);
+    if (authError || !supabase) return unauthorized(authError);
     const { searchParams } = new URL(request.url);
     const activeOnly = searchParams.get('active');
 
@@ -33,13 +53,46 @@ export async function GET(request: NextRequest) {
     }
 
     const { data, error } = await query;
+    if (error) return serverError(error.message);
+
+    return success(data);
+  } catch {
+    return unauthorized();
+  }
+}
+
+export async function POST(request: NextRequest) {
+  const { user, supabase, error: authError } = await getAuthUser(request);
+  if (authError || !user || !supabase) return unauthorized(authError);
+
+  try {
+    const { name, series_id, league_type } = await request.json();
+
+    if (!name || !series_id) {
+      return serverError('Name and Series ID are required');
+    }
+
+    // Generate a simple slug/key from the name
+    const key = name.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+
+    const { data, error } = await supabase
+      .from('leagues')
+      .insert({
+        name,
+        series_id,
+        key,
+        league_type: league_type || 'T20',
+        is_active: true,
+      })
+      .select()
+      .single();
 
     if (error) {
       return serverError(error.message);
     }
 
-    return success(data);
-  } catch {
-    return unauthorized();
+    return success(data, 'League added successfully', 201);
+  } catch (err) {
+    return serverError('Failed to add league');
   }
 }

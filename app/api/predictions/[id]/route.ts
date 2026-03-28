@@ -38,7 +38,8 @@ type RouteParams = { params: Promise<{ id: string }> };
 export async function PUT(request: NextRequest, { params }: RouteParams) {
   try {
     const { id } = await params;
-    const { user, supabase } = await getAuthUser(request);
+    const { user, supabase, error: authError } = await getAuthUser(request);
+    if (authError || !user || !supabase) return unauthorized(authError);
     const body: UpdatePredictionRequest = await request.json();
 
     if (!body.predicted_team) {

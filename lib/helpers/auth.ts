@@ -4,17 +4,18 @@ import type { Profile } from '@/lib/types';
 
 /**
  * Extracts JWT from the Authorization header and returns the authenticated user.
- * Throws if no valid token is found.
+ * Returns an error string if authentication fails.
  */
 export async function getAuthUser(request: NextRequest): Promise<{
-  user: { id: string; email: string };
-  profile: Profile;
-  supabase: ReturnType<typeof createServerClient>;
+  user: { id: string; email: string } | null;
+  profile: Profile | null;
+  supabase: ReturnType<typeof createServerClient> | null;
+  error?: string;
 }> {
   const authHeader = request.headers.get('Authorization');
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    throw new Error('Missing or invalid Authorization header');
+    return { user: null, profile: null, supabase: null, error: 'Missing or invalid Authorization header' };
   }
 
   const token = authHeader.replace('Bearer ', '');
@@ -23,7 +24,7 @@ export async function getAuthUser(request: NextRequest): Promise<{
   const { data: { user }, error: authError } = await supabase.auth.getUser();
 
   if (authError || !user) {
-    throw new Error('Invalid or expired token');
+    return { user: null, profile: null, supabase: null, error: 'Invalid or expired token' };
   }
 
   const { data: profile, error: profileError } = await supabase
@@ -33,7 +34,7 @@ export async function getAuthUser(request: NextRequest): Promise<{
     .single();
 
   if (profileError || !profile) {
-    throw new Error('Profile not found');
+    return { user: null, profile: null, supabase, error: 'Profile not found' };
   }
 
   return {

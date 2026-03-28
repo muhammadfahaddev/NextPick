@@ -47,10 +47,14 @@ type RouteParams = { params: Promise<{ id: string }> };
  *       201:
  *         description: Member added
  */
-export async function GET(request: NextRequest, { params }: RouteParams) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const { id } = await params;
-    const { user, supabase } = await getAuthUser(request);
+    const { user, supabase, error: authError } = await getAuthUser(request);
+    if (authError || !user || !supabase) return unauthorized(authError);
 
     if (!await isGroupMember(supabase, id, user.id)) {
       return forbidden('You are not a member of this group');
@@ -72,10 +76,14 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
   }
 }
 
-export async function POST(request: NextRequest, { params }: RouteParams) {
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const { id } = await params;
-    const { user, supabase } = await getAuthUser(request);
+    const { user, supabase, error: authError } = await getAuthUser(request);
+    if (authError || !user || !supabase) return unauthorized(authError);
 
     if (!await isGroupAdmin(supabase, id, user.id)) {
       return forbidden('Only group admins can add members');

@@ -51,7 +51,8 @@ import type { CreatePredictionRequest } from '@/lib/types';
  */
 export async function POST(request: NextRequest) {
   try {
-    const { user, supabase } = await getAuthUser(request);
+    const { user, supabase, error: authError } = await getAuthUser(request);
+    if (authError || !user || !supabase) return unauthorized(authError);
     const body: CreatePredictionRequest = await request.json();
 
     const { match_id, group_id, predicted_team } = body;
@@ -118,14 +119,16 @@ export async function POST(request: NextRequest) {
     }
 
     return created(data, 'Prediction created');
-  } catch {
-    return unauthorized();
+  } catch (err) {
+    console.error('POST /api/predictions error:', err);
+    return serverError('An error occurred during prediction');
   }
 }
 
 export async function GET(request: NextRequest) {
   try {
-    const { user, supabase } = await getAuthUser(request);
+    const { user, supabase, error: authError } = await getAuthUser(request);
+    if (authError || !user || !supabase) return unauthorized(authError);
     const { searchParams } = new URL(request.url);
     const groupId = searchParams.get('group_id');
     const leagueKey = searchParams.get('league');
@@ -157,7 +160,8 @@ export async function GET(request: NextRequest) {
     }
 
     return success(result);
-  } catch {
+  } catch (err) {
+    console.error('GET /api/predictions error:', err);
     return unauthorized();
   }
 }

@@ -24,10 +24,14 @@ type RouteParams = { params: Promise<{ id: string }> };
  *       404:
  *         description: Match not found
  */
-export async function GET(request: NextRequest, { params }: RouteParams) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
     const { id } = await params;
-    const { supabase } = await getAuthUser(request);
+    const { supabase, error: authError } = await getAuthUser(request);
+    if (authError || !supabase) return unauthorized(authError);
 
     const { data, error } = await supabase
       .from('matches')

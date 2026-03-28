@@ -160,6 +160,15 @@ export interface SyncResult {
 
 // ---------- CricAPI Types ----------
 
+export interface CricApiSeries {
+  id: string;
+  name: string;
+  startDate: string;
+  endDate: string;
+  status: string;
+  matches: number;
+}
+
 export interface CricApiMatch {
   id: string;
   name: string;

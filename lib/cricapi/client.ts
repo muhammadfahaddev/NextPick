@@ -28,10 +28,13 @@ export class CricApiClient {
   }
 
   /**
-   * Get all available series/leagues
+   * Get all available series/leagues (supports search)
    */
-  async getSeries(offset = 0) {
-    return this.fetch<CricApiSeriesResponse>('/series', { offset: offset.toString() });
+  async getSeries(search = '', offset = 0) {
+    return this.fetch<CricApiSeriesResponse>('/series', { 
+      search,
+      offset: offset.toString() 
+    });
   }
 
   /**

@@ -27,10 +27,14 @@ type RouteParams = { params: Promise<{ id: string; leagueId: string }> };
  *       200:
  *         description: League removed from group
  */
-export async function DELETE(request: NextRequest, { params }: RouteParams) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string; leagueId: string }> }
+) {
   try {
     const { id, leagueId } = await params;
-    const { user, supabase } = await getAuthUser(request);
+    const { user, supabase, error: authError } = await getAuthUser(request);
+    if (authError || !user || !supabase) return unauthorized(authError);
 
     if (!await isGroupAdmin(supabase, id, user.id)) {
       return forbidden('Only group admins can remove leagues');

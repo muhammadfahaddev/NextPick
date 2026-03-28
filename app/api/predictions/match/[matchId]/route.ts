@@ -27,10 +27,14 @@ type RouteParams = { params: Promise<{ matchId: string }> };
  *       200:
  *         description: All predictions for the match
  */
-export async function GET(request: NextRequest, { params }: RouteParams) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ matchId: string }> }
+) {
   try {
     const { matchId } = await params;
-    const { supabase } = await getAuthUser(request);
+    const { supabase, error: authError } = await getAuthUser(request);
+    if (authError || !supabase) return unauthorized(authError);
     const { searchParams } = new URL(request.url);
     const groupId = searchParams.get('group_id');
 

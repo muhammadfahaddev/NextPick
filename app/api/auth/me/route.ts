@@ -18,7 +18,8 @@ import { success, unauthorized, serverError } from '@/lib/helpers/errors';
  */
 export async function GET(request: NextRequest) {
   try {
-    const { user, profile } = await getAuthUser(request);
+    const { user, profile, error: authError } = await getAuthUser(request);
+    if (authError || !user || !profile) return unauthorized(authError || 'Profile not found');
 
     return success({
       id: user.id,

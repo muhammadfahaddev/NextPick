@@ -33,7 +33,8 @@ import { success, unauthorized, serverError } from '@/lib/helpers/errors';
  */
 export async function GET(request: NextRequest) {
   try {
-    const { supabase } = await getAuthUser(request);
+    const { supabase, error: authError } = await getAuthUser(request);
+    if (authError || !supabase) return unauthorized(authError);
     const { searchParams } = new URL(request.url);
     const leagueKey = searchParams.get('league');
     const leagueId = searchParams.get('league_id');

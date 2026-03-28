@@ -28,10 +28,14 @@ type RouteParams = { params: Promise<{ groupId: string }> };
  *       200:
  *         description: Ranked leaderboard
  */
-export async function GET(request: NextRequest, { params }: RouteParams) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ groupId: string }> }
+) {
   try {
     const { groupId } = await params;
-    const { user, supabase } = await getAuthUser(request);
+    const { user, supabase, error: authError } = await getAuthUser(request);
+    if (authError || !supabase || !user) return unauthorized(authError);
     const { searchParams } = new URL(request.url);
     const leagueKey = searchParams.get('league');
 

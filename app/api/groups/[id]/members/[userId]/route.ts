@@ -27,10 +27,14 @@ type RouteParams = { params: Promise<{ id: string; userId: string }> };
  *       200:
  *         description: Member removed
  */
-export async function DELETE(request: NextRequest, { params }: RouteParams) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string; userId: string }> }
+) {
   try {
     const { id, userId } = await params;
-    const { user, supabase } = await getAuthUser(request);
+    const { user, supabase, error: authError } = await getAuthUser(request);
+    if (authError || !user || !supabase) return unauthorized(authError);
 
     if (!await isGroupAdmin(supabase, id, user.id)) {
       return forbidden('Only group admins can remove members');

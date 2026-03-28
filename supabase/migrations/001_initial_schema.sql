@@ -6,7 +6,7 @@
 -- Create all tables first to avoid dependency issues in policies
 
 -- PROFILES
-CREATE TABLE public.profiles (
+CREATE TABLE IF NOT EXISTS public.profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   full_name TEXT NOT NULL,
   email TEXT UNIQUE NOT NULL,
@@ -15,7 +15,7 @@ CREATE TABLE public.profiles (
 );
 
 -- GROUPS
-CREATE TABLE public.groups (
+CREATE TABLE IF NOT EXISTS public.groups (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   invite_code TEXT UNIQUE NOT NULL,
@@ -24,7 +24,7 @@ CREATE TABLE public.groups (
 );
 
 -- GROUP_MEMBERS
-CREATE TABLE public.group_members (
+CREATE TABLE IF NOT EXISTS public.group_members (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   group_id UUID NOT NULL REFERENCES public.groups(id) ON DELETE CASCADE,
   user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
@@ -34,7 +34,7 @@ CREATE TABLE public.group_members (
 );
 
 -- LEAGUES
-CREATE TABLE public.leagues (
+CREATE TABLE IF NOT EXISTS public.leagues (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   key TEXT UNIQUE NOT NULL,
@@ -45,7 +45,7 @@ CREATE TABLE public.leagues (
 );
 
 -- GROUP_LEAGUES (junction)
-CREATE TABLE public.group_leagues (
+CREATE TABLE IF NOT EXISTS public.group_leagues (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   group_id UUID NOT NULL REFERENCES public.groups(id) ON DELETE CASCADE,
   league_id UUID NOT NULL REFERENCES public.leagues(id) ON DELETE CASCADE,
@@ -54,7 +54,7 @@ CREATE TABLE public.group_leagues (
 );
 
 -- MATCHES
-CREATE TABLE public.matches (
+CREATE TABLE IF NOT EXISTS public.matches (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   league_id UUID NOT NULL REFERENCES public.leagues(id) ON DELETE CASCADE,
   cricapi_match_id TEXT UNIQUE NOT NULL,
@@ -76,7 +76,7 @@ CREATE TABLE public.matches (
 );
 
 -- PREDICTIONS
-CREATE TABLE public.predictions (
+CREATE TABLE IF NOT EXISTS public.predictions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
   match_id UUID NOT NULL REFERENCES public.matches(id) ON DELETE CASCADE,

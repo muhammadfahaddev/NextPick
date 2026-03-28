@@ -31,7 +31,8 @@ import type { JoinGroupRequest } from '@/lib/types';
  */
 export async function POST(request: NextRequest) {
   try {
-    const { user, supabase } = await getAuthUser(request);
+    const { user, supabase, error: authError } = await getAuthUser(request);
+    if (authError || !user || !supabase) return unauthorized(authError);
     const body: JoinGroupRequest = await request.json();
 
     if (!body.invite_code) {
