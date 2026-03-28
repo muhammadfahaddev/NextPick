@@ -7,7 +7,7 @@ import { format } from 'date-fns';
 
 interface MatchCardProps {
   match: Match;
-  onPredict?: (matchId: string) => void;
+  onPredict?: (match: Match) => void;
 }
 
 export function MatchCard({ match, onPredict }: MatchCardProps) {
@@ -65,7 +65,7 @@ export function MatchCard({ match, onPredict }: MatchCardProps) {
               size="sm" 
               variant="primary" 
               className="px-4 rounded-lg h-9 group/btn"
-              onClick={() => onPredict?.(match.id)}
+              onClick={() => onPredict?.(match)}
             >
               Predict
               <ArrowRight className="w-3.5 h-3.5 ml-1 group-hover/btn:translate-x-1 transition-transform" />

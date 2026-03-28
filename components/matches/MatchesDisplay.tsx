@@ -1,14 +1,22 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useMatches } from '@/hooks/useMatches';
+import { useMatches, Match } from '@/hooks/useMatches';
 import { MatchCard } from './MatchCard';
+import { PredictionModal } from '@/components/predictions/PredictionModal';
 import { Trophy, Calendar, Filter, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function MatchesDisplay() {
   const [selectedLeague, setSelectedLeague] = useState<string | undefined>(undefined);
+  const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const { matches, leagues, loading, error } = useMatches(selectedLeague);
+
+  const handlePredictClick = (match: Match) => {
+    setSelectedMatch(match);
+    setIsModalOpen(true);
+  };
 
   if (loading) {
     return (
@@ -76,7 +84,7 @@ export function MatchesDisplay() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {liveMatches.map((match) => (
-              <MatchCard key={match.id} match={match} />
+              <MatchCard key={match.id} match={match} onPredict={handlePredictClick} />
             ))}
           </div>
         </div>
@@ -92,7 +100,7 @@ export function MatchesDisplay() {
         {upcomingMatches.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {upcomingMatches.map((match) => (
-              <MatchCard key={match.id} match={match} />
+              <MatchCard key={match.id} match={match} onPredict={handlePredictClick} />
             ))}
           </div>
         ) : (
@@ -107,6 +115,12 @@ export function MatchesDisplay() {
           </div>
         )}
       </div>
+
+      <PredictionModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        match={selectedMatch} 
+      />
     </div>
   );
 }
