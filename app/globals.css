@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  color-scheme: dark;
   --background: #05070a;
   --foreground: #f8fafc;
   
@@ -11,7 +12,7 @@
   --danger: #ef4444;
   
   /* Glassmorphism */
-  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-bg: rgba(255, 255, 255, 0.05); /* Slightly darker for better contrast on dark bg */
   --glass-border: rgba(255, 255, 255, 0.1);
   --glass-blur: blur(12px);
 

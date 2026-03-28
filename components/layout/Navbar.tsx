@@ -1,11 +1,16 @@
 'use client';
 
 import React from 'react';
-import { Bell, Search, Menu, UserCircle } from 'lucide-react';
+import { Bell, Search, Menu, UserCircle, LogOut } from 'lucide-react';
 import { Logo } from '@/components/ui/Logo';
+import { useAuth } from '@/components/providers/AuthProvider';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/Button';
 
 export function Navbar() {
+  const { user, signOut } = useAuth();
+  const fullName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User';
+
   return (
     <header className="fixed top-0 right-0 h-16 w-full lg:w-[calc(100%-256px)] bg-background/50 backdrop-blur-xl border-b border-border/50 z-40 transition-all duration-300">
       <div className="h-full px-4 lg:px-8 flex items-center justify-between">
@@ -38,14 +43,27 @@ export function Navbar() {
             <div className="absolute top-2 right-2 w-2 h-2 rounded-full bg-primary border-2 border-background" />
           </button>
 
-          <div className="flex items-center gap-2 pl-4 border-l border-border/50 group cursor-pointer">
+          <div className="flex items-center gap-3 pl-4 border-l border-border/50 group">
             <div className="flex flex-col items-end mr-1 hidden sm:flex">
-              <span className="text-sm font-medium">Fahad</span>
-              <span className="text-xs text-muted">1280 pts</span>
+              <span className="text-sm font-medium">{fullName}</span>
+              <span className="text-xs text-muted">Active Session</span>
             </div>
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 border border-white/10 flex items-center justify-center p-0.5 group-hover:scale-105 transition-transform">
-              <div className="w-full h-full rounded-full bg-background flex items-center justify-center">
-                <UserCircle className="w-8 h-8 text-primary/80" />
+            <div className="relative group/user">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 border border-white/10 flex items-center justify-center p-0.5 group-hover/user:scale-105 transition-transform cursor-pointer overflow-hidden">
+                <div className="w-full h-full rounded-full bg-background flex items-center justify-center">
+                  <UserCircle className="w-8 h-8 text-primary/80" />
+                </div>
+              </div>
+              
+              {/* Simple Tooltip-style Menu */}
+              <div className="absolute right-0 mt-2 w-48 glass border border-white/10 rounded-xl p-1 opacity-0 group-hover/user:opacity-100 transition-opacity pointer-events-none group-hover/user:pointer-events-auto">
+                <button 
+                  onClick={() => signOut()}
+                  className="w-full flex items-center gap-2 px-3 py-2 text-sm text-danger hover:bg-danger/10 rounded-lg transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Sign Out
+                </button>
               </div>
             </div>
           </div>

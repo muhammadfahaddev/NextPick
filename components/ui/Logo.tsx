@@ -17,8 +17,8 @@ export function Logo({ className, iconOnly = false }: LogoProps) {
         </div>
       </div>
       {!iconOnly && (
-        <span className="font-outfit text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">
-          Next<span className="text-primary">Pick</span>
+        <span className="font-outfit text-xl font-bold tracking-tight text-white">
+          Next<span className="text-primary italic">Pick</span>
         </span>
       )}
     </div>

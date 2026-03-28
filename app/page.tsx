@@ -19,7 +19,7 @@ export default function Home() {
       <div className="flex flex-col sm:flex-row gap-4 animate-in fade-in slide-in-from-bottom-8 duration-1000">
         <Link 
           href="/dashboard" 
-          className="px-8 py-4 rounded-full bg-primary text-background font-bold text-lg hover:scale-105 active:scale-95 transition-all flex items-center gap-2 group shadow-xl shadow-primary/20"
+          className="px-8 py-4 rounded-full bg-primary text-[#05070a] font-bold text-lg hover:bg-primary/90 hover:scale-105 active:scale-95 transition-all flex items-center gap-2 group shadow-xl shadow-primary/20"
         >
           Enter NextPick
           <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
