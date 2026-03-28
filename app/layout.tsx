@@ -27,8 +27,12 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${inter.variable} ${outfit.variable} h-full antialiased dark`}
+      suppressHydrationWarning
     >
-      <body className="min-h-screen bg-background text-foreground selection:bg-primary/30">
+      <body 
+        className="min-h-screen bg-background text-foreground selection:bg-primary/30"
+        suppressHydrationWarning
+      >
         <AuthProvider>
           {children}
         </AuthProvider>
