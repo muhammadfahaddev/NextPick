@@ -47,11 +47,11 @@ export function MatchCard({ match, onPredict }: MatchCardProps) {
       {/* Card Body (Teams) */}
       <div className="p-6">
         <div className="flex items-center justify-between gap-4">
-          <TeamView name={match.team_a} score={match.score_a} />
+          <TeamView name={match.team_a} score={match.score_a} img={match.team_a_img} />
           <div className="flex flex-col items-center gap-1">
             <span className="text-xs font-outfit font-bold text-muted/50 italic">VS</span>
           </div>
-          <TeamView name={match.team_b} score={match.score_b} align="right" />
+          <TeamView name={match.team_b} score={match.score_b} img={match.team_b_img} align="right" />
         </div>
 
         <div className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between">
@@ -79,8 +79,10 @@ export function MatchCard({ match, onPredict }: MatchCardProps) {
   );
 }
 
-function TeamView({ name, score, align = 'left' }: { name?: string, score?: string, align?: 'left' | 'right' }) {
-  const initials = name ? name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : '??';
+function TeamView({ name, score, img, align = 'left' }: { name?: string, score?: string, img?: string, align?: 'left' | 'right' }) {
+  const initials = name 
+    ? name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() 
+    : '??';
   
   return (
     <div className={cn(
@@ -91,11 +93,22 @@ function TeamView({ name, score, align = 'left' }: { name?: string, score?: stri
         "flex items-center gap-3",
         align === 'right' ? "flex-row-reverse" : "flex-row"
       )}>
-        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-white/10 to-transparent border border-white/10 flex items-center justify-center font-outfit font-bold text-lg text-white/80 shrink-0">
-          {initials}
+        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-white/10 to-transparent border border-white/10 flex items-center justify-center font-outfit font-bold text-lg text-white/80 shrink-0 overflow-hidden shadow-inner">
+          {img ? (
+            <img 
+              src={img} 
+              alt={name} 
+              className="w-full h-full object-cover p-1.5"
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = 'none';
+              }}
+            />
+          ) : (
+            <span className="text-white/40">{initials}</span>
+          )}
         </div>
         <div className="min-w-0">
-          <h4 className="font-outfit font-bold text-sm lg:text-base truncate leading-tight">{name}</h4>
+          <h4 className="font-outfit font-bold text-sm lg:text-base truncate leading-tight group-hover:text-primary transition-colors">{name}</h4>
           {score && <p className="text-primary font-bold text-lg leading-tight mt-1">{score}</p>}
         </div>
       </div>

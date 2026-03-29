@@ -17,12 +17,16 @@ export function usePredictions() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const getMatchPrediction = useCallback(async (matchId: string) => {
+  const getMatchPrediction = useCallback(async (matchId: string, groupId?: string) => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return null;
 
-      const res = await fetch(`/api/predictions/match/${matchId}`, {
+      const url = groupId 
+        ? `/api/predictions/match/${matchId}?group_id=${groupId}`
+        : `/api/predictions/match/${matchId}`;
+
+      const res = await fetch(url, {
         headers: { Authorization: `Bearer ${session.access_token}` },
       });
       const data = await res.json();

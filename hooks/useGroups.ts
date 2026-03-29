@@ -36,7 +36,7 @@ export function useGroups() {
     }
   };
 
-  const createGroup = async (name: string) => {
+  const createGroup = async (name: string, leagueId?: string) => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error('Not authenticated');
@@ -47,7 +47,7 @@ export function useGroups() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${session.access_token}`,
         },
-        body: JSON.stringify({ name }),
+        body: JSON.stringify({ name, leagueId }),
       });
 
       const data = await res.json();

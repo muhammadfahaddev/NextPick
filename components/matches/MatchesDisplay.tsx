@@ -7,13 +7,25 @@ import { PredictionModal } from '@/components/predictions/PredictionModal';
 import { Trophy, Calendar, Filter, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-export function MatchesDisplay() {
-  const [selectedLeague, setSelectedLeague] = useState<string | undefined>(undefined);
+interface MatchesDisplayProps {
+  groupId?: string;
+  leagueId?: string;
+  title?: string;
+  hideFilters?: boolean;
+}
+
+export function MatchesDisplay({ groupId, leagueId, title, hideFilters }: MatchesDisplayProps) {
+  const [selectedLeague, setSelectedLeague] = useState<string | undefined>(leagueId);
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { matches, leagues, loading, error } = useMatches(selectedLeague);
+  const { matches, leagues, loading, error } = useMatches(selectedLeague || leagueId);
 
   const handlePredictClick = (match: Match) => {
+    if (!groupId) {
+      // If no group, we could redirect to groups page or show a toast
+      window.location.href = '/groups';
+      return;
+    }
     setSelectedMatch(match);
     setIsModalOpen(true);
   };
@@ -47,33 +59,35 @@ export function MatchesDisplay() {
   return (
     <div className="space-y-8">
       {/* League Filters */}
-      <div className="flex items-center gap-4 overflow-x-auto pb-2 no-scrollbar">
-        <button
-          onClick={() => setSelectedLeague(undefined)}
-          className={cn(
-            "px-6 py-2.5 rounded-full text-sm font-medium transition-all whitespace-nowrap border",
-            !selectedLeague 
-              ? "bg-primary text-background border-primary" 
-              : "glass border-white/10 text-muted hover:border-white/30"
-          )}
-        >
-          All Matches
-        </button>
-        {leagues.map((league) => (
+      {!hideFilters && (
+        <div className="flex items-center gap-4 overflow-x-auto pb-2 no-scrollbar">
           <button
-            key={league.id}
-            onClick={() => setSelectedLeague(league.id)}
+            onClick={() => setSelectedLeague(undefined)}
             className={cn(
               "px-6 py-2.5 rounded-full text-sm font-medium transition-all whitespace-nowrap border",
-              selectedLeague === league.id 
+              !selectedLeague 
                 ? "bg-primary text-background border-primary" 
                 : "glass border-white/10 text-muted hover:border-white/30"
             )}
           >
-            {league.name}
+            All Matches
           </button>
-        ))}
-      </div>
+          {leagues.map((league) => (
+            <button
+              key={league.id}
+              onClick={() => setSelectedLeague(league.id)}
+              className={cn(
+                "px-6 py-2.5 rounded-full text-sm font-medium transition-all whitespace-nowrap border",
+                selectedLeague === league.id 
+                  ? "bg-primary text-background border-primary" 
+                  : "glass border-white/10 text-muted hover:border-white/30"
+              )}
+            >
+              {league.name}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Live Matches Section */}
       {liveMatches.length > 0 && (
@@ -94,7 +108,7 @@ export function MatchesDisplay() {
       <div className="space-y-4">
         <div className="flex items-center gap-2 text-muted">
           <Calendar className="w-5 h-5" />
-          <h3 className="text-xl font-outfit font-bold uppercase tracking-tight">Upcoming Series</h3>
+          <h3 className="text-xl font-outfit font-bold uppercase tracking-tight">{title || 'Upcoming Series'}</h3>
         </div>
         
         {upcomingMatches.length > 0 ? (
@@ -120,6 +134,7 @@ export function MatchesDisplay() {
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
         match={selectedMatch} 
+        groupId={groupId}
       />
     </div>
   );

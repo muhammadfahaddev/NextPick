@@ -2,7 +2,14 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/lib/supabase/client';
-import { Group } from './useGroups';
+export interface Group {
+  id: string;
+  name: string;
+  invite_code: string;
+  created_by: string;
+  created_at: string;
+  league_id?: string;
+}
 
 export interface GroupMember {
   user_id: string;
@@ -30,7 +37,11 @@ export function useGroupDetails(groupId: string) {
       });
       const groupData = await groupRes.json();
       if (!groupRes.ok) throw new Error(groupData.message || 'Group not found');
-      setGroup(groupData.data);
+      
+      const rawGroup = groupData.data;
+      const league_id = rawGroup.group_leagues?.[0]?.league_id;
+      
+      setGroup({ ...rawGroup, league_id });
 
       // Fetch Members
       const membersRes = await fetch(`/api/groups/${groupId}/members`, {

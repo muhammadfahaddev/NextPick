@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
   if (authError || !user) return unauthorized(authError);
 
   try {
-    const body: CreateGroupRequest = await request.json();
+    const body: any = await request.json();
 
     if (!body.name || body.name.trim().length === 0) {
       return badRequest('Group name is required');
@@ -103,6 +103,21 @@ export async function POST(request: NextRequest) {
       // Clean up orphaned group
       await adminClient.from('groups').delete().eq('id', group.id);
       return serverError(memberError.message);
+    }
+
+    // Associate League if provided
+    if (body.leagueId) {
+      const { error: leagueError } = await adminClient
+        .from('group_leagues')
+        .insert({
+          group_id: group.id,
+          league_id: body.leagueId,
+        });
+      
+      if (leagueError) {
+        console.error('League association error:', leagueError);
+        // We don't necessarily delete the group if this fails, but it's good to log
+      }
     }
 
     return created({ ...group, my_role: 'ADMIN' }, 'Group created successfully');

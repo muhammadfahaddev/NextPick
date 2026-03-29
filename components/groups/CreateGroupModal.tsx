@@ -6,6 +6,7 @@ import { X, Users, Hash, Plus, ArrowRight, AlertCircle, Loader2 } from 'lucide-r
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { useGroups } from '@/hooks/useGroups';
+import { useMatches } from '@/hooks/useMatches';
 import { cn } from '@/lib/utils';
 
 interface CreateGroupModalProps {
@@ -16,10 +17,13 @@ interface CreateGroupModalProps {
 export function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
   const [activeTab, setActiveTab] = useState<'create' | 'join'>('create');
   const [groupName, setGroupName] = useState('');
+  const [leagueId, setLeagueId] = useState('');
   const [inviteCode, setInviteCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
   const { createGroup, joinGroup } = useGroups();
+  const { leagues, loading: leaguesLoading } = useMatches();
 
   const handleAction = async () => {
     setLoading(true);
@@ -27,7 +31,8 @@ export function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
     try {
       if (activeTab === 'create') {
         if (!groupName) throw new Error('Group name is required');
-        await createGroup(groupName);
+        if (!leagueId) throw new Error('Please select a league for this group');
+        await createGroup(groupName, leagueId);
       } else {
         if (!inviteCode) throw new Error('Invite code is required');
         await joinGroup(inviteCode);
@@ -35,6 +40,7 @@ export function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
       onClose();
       setGroupName('');
       setInviteCode('');
+      setLeagueId('');
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -101,6 +107,21 @@ export function CreateGroupModal({ isOpen, onClose }: CreateGroupModalProps) {
                         value={groupName}
                         onChange={(e) => setGroupName(e.target.value)}
                       />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium ml-1">Select League</label>
+                      <select 
+                        className="w-full h-11 bg-white/5 border border-white/10 rounded-xl px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 appearance-none"
+                        value={leagueId}
+                        onChange={(e) => setLeagueId(e.target.value)}
+                        disabled={leaguesLoading}
+                      >
+                        <option value="" className="bg-background">Choose a league...</option>
+                        {leagues.map(l => (
+                          <option key={l.id} value={l.id} className="bg-background">{l.name}</option>
+                        ))}
+                      </select>
+                      {leaguesLoading && <p className="text-[10px] text-primary animate-pulse ml-1">Loading leagues...</p>}
                     </div>
                   </div>
                 ) : (

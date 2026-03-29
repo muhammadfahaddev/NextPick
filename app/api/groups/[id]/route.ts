@@ -73,7 +73,7 @@ export async function GET(
 
     const { data: group, error } = await supabase
       .from('groups')
-      .select('*, group_members(id, user_id, role, profiles(id, full_name, email, avatar_url))')
+      .select('*, group_leagues(league_id), group_members(id, user_id, role, profiles(id, full_name, email, avatar_url))')
       .eq('id', id)
       .single();
 

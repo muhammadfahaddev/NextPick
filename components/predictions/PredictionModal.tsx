@@ -13,27 +13,30 @@ interface PredictionModalProps {
   isOpen: boolean;
   onClose: () => void;
   match: Match | null;
+  groupId?: string;
 }
 
-export function PredictionModal({ isOpen, onClose, match }: PredictionModalProps) {
-  const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
+export function PredictionModal({ isOpen, onClose, match, groupId }: PredictionModalProps) {
+  const [selectedTeam, setSelectedTeam] = useState<string | null>(null); // Stores 'team_a' or 'team_b'
   const [existingPrediction, setExistingPrediction] = useState<any>(null);
   const { submitPrediction, getMatchPrediction, loading, error } = usePredictions();
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
-    if (isOpen && match) {
-      getMatchPrediction(match.id).then(setExistingPrediction);
+    if (isOpen && match && groupId) {
+      getMatchPrediction(match.id, groupId).then(setExistingPrediction);
       setSuccess(false);
       setSelectedTeam(null);
     }
-  }, [isOpen, match, getMatchPrediction]);
+  }, [isOpen, match, groupId, getMatchPrediction]);
 
   const handleSubmit = async () => {
     if (!match || !selectedTeam) return;
 
+    const teamName = selectedTeam === 'team_a' ? match.team_a : match.team_b;
+
     try {
-      await submitPrediction(match.id, selectedTeam);
+      await submitPrediction(match.id, teamName, groupId);
       setSuccess(true);
       setTimeout(() => {
         onClose();
@@ -90,13 +93,14 @@ export function PredictionModal({ isOpen, onClose, match }: PredictionModalProps
                     </div>
                   </div>
                 ) : (
-                  <div className="flex items-center gap-6 justify-center py-4">
+                  <div className="flex items-center gap-8 justify-center py-4">
                     {teams.map((team) => (
                       <TeamOption 
                         key={team.id}
                         name={team.name}
-                        isSelected={selectedTeam === team.name}
-                        onClick={() => setSelectedTeam(team.name)}
+                        img={team.img}
+                        isSelected={selectedTeam === team.id}
+                        onClick={() => setSelectedTeam(team.id)}
                       />
                     ))}
                   </div>
@@ -149,37 +153,49 @@ export function PredictionModal({ isOpen, onClose, match }: PredictionModalProps
 }
 
 interface TeamOptionProps {
-  name: string;
+  name: string | null | undefined;
+  img?: string | null;
   isSelected: boolean;
   onClick: () => void;
 }
 
-function TeamOption({ name, isSelected, onClick }: TeamOptionProps) {
+function TeamOption({ name, img, isSelected, onClick }: TeamOptionProps) {
   const initials = (name || '??').split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
 
   return (
     <button
       onClick={onClick}
       className={cn(
-        "flex flex-col items-center gap-4 group p-4 rounded-3xl transition-all duration-300 border-2",
+        "flex flex-col items-center gap-4 group p-4 rounded-3xl transition-all duration-300 border-2 w-32",
         isSelected 
           ? "border-primary bg-primary/10 scale-105 shadow-xl shadow-primary/10" 
           : "border-transparent hover:border-white/10"
       )}
     >
       <div className={cn(
-        "w-24 h-24 rounded-[2rem] flex items-center justify-center font-outfit font-black text-3xl transition-all duration-500",
+        "w-24 h-24 rounded-[2rem] flex items-center justify-center font-outfit font-black text-3xl transition-all duration-500 overflow-hidden",
         isSelected 
-          ? "bg-primary text-background" 
+          ? "bg-primary text-background shadow-lg shadow-primary/25" 
           : "bg-white/5 text-muted/50 group-hover:bg-white/10 group-hover:text-white/80"
       )}>
-        {initials}
+        {img ? (
+          <img 
+            src={img} 
+            alt={name || 'Team'} 
+            className="w-full h-full object-cover p-3"
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = 'none';
+            }}
+          />
+        ) : (
+          <span>{initials}</span>
+        )}
       </div>
       <span className={cn(
-        "text-sm font-bold transition-colors",
+        "text-xs lg:text-sm font-bold transition-colors text-center line-clamp-2",
         isSelected ? "text-primary" : "text-muted group-hover:text-white"
       )}>
-        {name}
+        {name || 'TBD'}
       </span>
     </button>
   );

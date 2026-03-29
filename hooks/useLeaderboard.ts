@@ -34,7 +34,11 @@ export function useLeaderboard(groupId?: string) {
       const json = await res.json();
       if (!res.ok) throw new Error(json.message || 'Failed to fetch leaderboard');
       
-      setData(json.data || []);
+      const leaderboardData = Array.isArray(json.data) 
+        ? json.data 
+        : (json.data?.leaderboard || []);
+        
+      setData(leaderboardData);
     } catch (err: any) {
       setError(err.message);
     } finally {

@@ -3,7 +3,8 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Mail, Lock, AlertCircle, ArrowRight } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Mail, Lock, AlertCircle, ArrowRight, Globe } from 'lucide-react';
 import { supabase } from '@/lib/supabase/client';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -37,61 +38,96 @@ export default function LoginPage() {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-6 relative overflow-hidden">
-      {/* Background Orbs */}
-      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/20 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-secondary/10 rounded-full blur-[120px] pointer-events-none" />
+  const containerVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { duration: 0.6, staggerChildren: 0.1 }
+    }
+  };
 
-      <div className="w-full max-w-md relative animate-in fade-in zoom-in duration-500">
-        <div className="flex flex-col items-center mb-8">
-          <Logo className="scale-125 mb-4" />
-          <h1 className="text-3xl font-outfit font-bold">Welcome back!</h1>
-          <p className="text-muted text-center mt-2">Enter your credentials to access your predictions.</p>
+  const itemVariants = {
+    hidden: { opacity: 0, x: -10 },
+    visible: { opacity: 1, x: 0 }
+  };
+
+  return (
+    <div className="min-h-screen bg-background flex items-center justify-center p-6 relative overflow-hidden font-outfit">
+      {/* Dynamic Background Elements */}
+      <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-primary/10 rounded-full blur-[140px] pointer-events-none animate-pulse-slow" />
+      <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-secondary/5 rounded-full blur-[140px] pointer-events-none animate-float" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.02)_0%,transparent_100%)] pointer-events-none" />
+
+      <motion.div 
+        initial="hidden"
+        animate="visible"
+        variants={containerVariants}
+        className="w-full max-w-[440px] relative"
+      >
+        <div className="flex flex-col items-center mb-10">
+          <motion.div variants={itemVariants} className="mb-6">
+            <Logo className="scale-[1.5]" />
+          </motion.div>
+          <motion.h1 variants={itemVariants} className="text-4xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-white to-white/60">
+            Welcome back!
+          </motion.h1>
+          <motion.p variants={itemVariants} className="text-muted-foreground text-center mt-3 text-lg">
+            Enter your credentials to access your predictions.
+          </motion.p>
         </div>
 
-        <div className="glass-card p-8 border border-white/10 shadow-2xl">
+        <motion.div 
+          variants={itemVariants}
+          className="glass-card p-8 sm:p-10"
+        >
           <form onSubmit={handleLogin} className="space-y-6">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium ml-1">Email Address</label>
+            <div className="space-y-5">
+              <div className="space-y-2.5">
+                <label className="text-sm font-semibold ml-1 text-white/80">Email Address</label>
                 <Input
                   type="email"
                   placeholder="name@example.com"
-                  icon={<Mail className="w-4 h-4" />}
+                  icon={<Mail className="w-5 h-5" />}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  autoComplete="email"
                 />
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2.5">
                 <div className="flex items-center justify-between ml-1">
-                  <label className="text-sm font-medium">Password</label>
-                  <Link href="/forgot-password" title="Forgot Password" className="text-xs text-primary hover:underline">
-                    Forgot?
+                  <label className="text-sm font-semibold text-white/80">Password</label>
+                  <Link href="/forgot-password" title="Forgot Password" className="text-xs font-medium text-primary hover:text-primary/80 transition-colors">
+                    Forgot Password?
                   </Link>
                 </div>
                 <Input
                   type="password"
                   placeholder="••••••••"
-                  icon={<Lock className="w-4 h-4" />}
+                  icon={<Lock className="w-5 h-5" />}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  autoComplete="current-password"
                 />
               </div>
             </div>
 
             {error && (
-              <div className="bg-danger/10 border border-danger/20 text-danger text-sm p-3 rounded-xl flex items-start gap-2">
-                <AlertCircle className="w-4 h-4 mt-0.5" />
+              <motion.div 
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                className="bg-danger/10 border border-danger/20 text-danger text-sm p-4 rounded-xl flex items-start gap-3"
+              >
+                <AlertCircle className="w-5 h-5 mt-0.5 shrink-0" />
                 <span>{error}</span>
-              </div>
+              </motion.div>
             )}
 
             <Button 
               type="submit" 
-              className="w-full" 
+              className="w-full h-12 shadow-lg shadow-primary/20 text-base" 
               size="lg" 
               isLoading={isLoading}
             >
@@ -100,16 +136,42 @@ export default function LoginPage() {
             </Button>
           </form>
 
-          <div className="mt-8 text-center border-t border-white/5 pt-6">
-            <p className="text-sm text-muted">
+          <div className="mt-8">
+            <div className="relative mb-8">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t border-white/10" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-[#05070a]/50 px-2 text-muted-foreground backdrop-blur-sm">Or continue with</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <Button variant="glass" className="h-11 border-white/5 hover:bg-white/5 bg-white/[0.02]">
+                <Globe className="w-4 h-4 mr-2" />
+                Google
+              </Button>
+              <Button variant="glass" className="h-11 border-white/5 hover:bg-white/5 bg-white/[0.02]">
+                <Mail className="w-4 h-4 mr-2" />
+                GitHub
+              </Button>
+            </div>
+          </div>
+
+          <div className="mt-10 text-center border-t border-white/5 pt-8">
+            <p className="text-sm text-muted-foreground">
               Don't have an account?{' '}
-              <Link href="/signup" className="text-primary font-bold hover:underline">
+              <Link href="/signup" className="text-primary font-bold hover:underline underline-offset-4">
                 Register now
               </Link>
             </p>
           </div>
-        </div>
-      </div>
+        </motion.div>
+        
+        <motion.p variants={itemVariants} className="text-center mt-8 text-xs text-muted-foreground opacity-50">
+          © 2024 NextPick Predictions. All rights reserved.
+        </motion.p>
+      </motion.div>
     </div>
   );
 }

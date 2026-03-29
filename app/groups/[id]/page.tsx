@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/Button';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
+import { MatchesDisplay } from '@/components/matches/MatchesDisplay';
+
 export default function GroupDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const { group, members, loading: groupLoading, error: groupError } = useGroupDetails(id);
@@ -35,7 +37,7 @@ export default function GroupDetailPage({ params }: { params: Promise<{ id: stri
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-20">
+    <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-20">
       {/* Header & Back Button */}
       <div className="space-y-6">
         <Link href="/groups" className="inline-flex items-center gap-2 text-sm text-muted hover:text-white transition-colors group">
@@ -64,7 +66,23 @@ export default function GroupDetailPage({ params }: { params: Promise<{ id: stri
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      {/* Matches for Group League */}
+      {group.league_id && (
+        <section className="space-y-6 pt-4 border-t border-white/5">
+          <div className="flex items-center gap-3">
+             <Trophy className="w-6 h-6 text-primary" />
+             <h2 className="text-2xl font-outfit font-bold">Group Predictions</h2>
+          </div>
+          <MatchesDisplay 
+            groupId={id} 
+            leagueId={group.league_id} 
+            title="Available Matches" 
+            hideFilters 
+          />
+        </section>
+      )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
         {/* Leaderboard Column - Taking 2/3 space */}
         <div className="lg:col-span-2 space-y-6">
           <div className="flex items-center justify-between mb-2">
