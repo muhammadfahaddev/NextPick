@@ -9,11 +9,13 @@ export interface Match {
   match_type: string;
   status: string;
   venue: string;
-  date: string;
-  team_a: string;
-  team_b: string;
-  team_a_img?: string;
-  team_b_img?: string;
+  match_datetime: string;
+  team1_name: string;
+  team2_name: string;
+  team1_img?: string;
+  team2_img?: string;
+  team1_short?: string;
+  team2_short?: string;
   league_id: string;
   series_id: string;
   score_a?: string;

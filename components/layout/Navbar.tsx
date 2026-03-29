@@ -21,9 +21,9 @@ export function Navbar() {
           <div className="lg:hidden">
             <Logo iconOnly />
           </div>
-          <div className="hidden lg:flex items-center gap-4">
-            <h1 className="text-sm font-medium text-muted uppercase tracking-widest">
-              NextPick / <span className="text-foreground">Predict Cricket, Win Big</span>
+          <div className="hidden xl:flex items-center gap-4">
+            <h1 className="text-[10px] font-bold text-muted uppercase tracking-[0.2em] whitespace-nowrap">
+              NextPick / <span className="text-foreground/80 font-extrabold">Predict Cricket, Win Big</span>
             </h1>
           </div>
         </div>

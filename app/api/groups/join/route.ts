@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { getAuthUser } from '@/lib/helpers/auth';
-import { success, badRequest, unauthorized, notFound, serverError } from '@/lib/helpers/errors';
+import { getSupabaseAdmin } from '@/lib/supabase/admin';
+import { success, badRequest, unauthorized, serverError } from '@/lib/helpers/errors';
 import type { JoinGroupRequest } from '@/lib/types';
 
 /**
@@ -39,15 +40,16 @@ export async function POST(request: NextRequest) {
       return badRequest('Invite code is required');
     }
 
-    // Find group by invite code
-    const { data: group, error: groupError } = await supabase
+    // Find group by invite code — using admin client to bypass RLS check
+    const adminClient = getSupabaseAdmin();
+    const { data: group, error: groupError } = await adminClient
       .from('groups')
       .select('id, name')
       .eq('invite_code', body.invite_code.toUpperCase())
       .single();
 
     if (groupError || !group) {
-      return notFound('Invalid invite code');
+      return badRequest('Invalid invite code');
     }
 
     // Check if already a member
@@ -76,7 +78,8 @@ export async function POST(request: NextRequest) {
     }
 
     return success({ group_id: group.id, group_name: group.name, role: 'MEMBER' }, 'Joined group successfully');
-  } catch {
+  } catch (err) {
+    console.error('Join group error:', err);
     return unauthorized();
   }
 }

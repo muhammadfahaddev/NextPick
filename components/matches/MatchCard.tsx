@@ -16,11 +16,11 @@ export function MatchCard({ match, onPredict }: MatchCardProps) {
   
   let formattedDate = 'TBD';
   try {
-    if (match.date) {
-      formattedDate = format(new Date(match.date), 'MMM dd, h:mm a');
+    if (match.match_datetime) {
+      formattedDate = format(new Date(match.match_datetime), 'MMM dd, h:mm a');
     }
   } catch (err) {
-    console.warn('Invalid match date:', match.date);
+    console.warn('Invalid match date:', match.match_datetime);
   }
 
   return (
@@ -47,11 +47,11 @@ export function MatchCard({ match, onPredict }: MatchCardProps) {
       {/* Card Body (Teams) */}
       <div className="p-6">
         <div className="flex items-center justify-between gap-4">
-          <TeamView name={match.team_a} score={match.score_a} img={match.team_a_img} />
+          <TeamView name={match.team1_name} score={match.score_a} img={match.team1_img} />
           <div className="flex flex-col items-center gap-1">
             <span className="text-xs font-outfit font-bold text-muted/50 italic">VS</span>
           </div>
-          <TeamView name={match.team_b} score={match.score_b} img={match.team_b_img} align="right" />
+          <TeamView name={match.team2_name} score={match.score_b} img={match.team2_img} align="right" />
         </div>
 
         <div className="mt-6 pt-4 border-t border-white/5 flex items-center justify-between">
